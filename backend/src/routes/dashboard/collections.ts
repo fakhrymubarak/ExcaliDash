@@ -47,26 +47,6 @@ export const registerCollectionRoutes = (
         shareCountMap.map((s) => s.collectionId),
       );
 
-      const ownedCollections = rawCollections
-        .filter((c) => !(hasInternalTrash && c.id === "trash"))
-        .map((c) =>
-          c.id === trashCollectionId
-            ? {
-                ...c,
-                id: "trash",
-                name: "Trash",
-                sharedRole: null,
-                isOwner: true,
-                isShared: false,
-              }
-            : {
-                ...c,
-                sharedRole: null,
-                isOwner: true,
-                isShared: sharedCollectionIds.has(c.id),
-              },
-        );
-
       // Collections shared with this user by others
       const sharedEntries = await prisma.collectionShare.findMany({
         where: { granteeUserId: req.user.id },
@@ -78,10 +58,50 @@ export const registerCollectionRoutes = (
           },
         },
       });
+
+      const drawingCountRows = await prisma.drawing.groupBy({
+        by: ["collectionId"],
+        where: {
+          collectionId: {
+            in: [
+              ...rawCollections.map((c) => c.id),
+              ...sharedEntries.map((s) => s.collection.id),
+            ],
+          },
+        },
+        _count: { collectionId: true },
+      });
+      const drawingCountMap = new Map(
+        drawingCountRows.map((row) => [row.collectionId, row._count.collectionId]),
+      );
+
+      const ownedCollections = rawCollections
+        .filter((c) => !(hasInternalTrash && c.id === "trash"))
+        .map((c) =>
+          c.id === trashCollectionId
+            ? {
+                ...c,
+                id: "trash",
+                name: "Trash",
+                sharedRole: null,
+                isOwner: true,
+                isShared: false,
+                drawingCount: drawingCountMap.get(c.id) ?? 0,
+              }
+            : {
+                ...c,
+                sharedRole: null,
+                isOwner: true,
+                isShared: sharedCollectionIds.has(c.id),
+                drawingCount: drawingCountMap.get(c.id) ?? 0,
+              },
+        );
+
       const sharedCollections = sharedEntries.map((s) => ({
         ...s.collection,
         sharedRole: s.role,
         isOwner: false,
+        drawingCount: drawingCountMap.get(s.collection.id) ?? 0,
       }));
 
       return res.json([...ownedCollections, ...sharedCollections]);

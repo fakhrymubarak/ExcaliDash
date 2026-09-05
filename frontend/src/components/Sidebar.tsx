@@ -209,29 +209,31 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   onDrop={onDrop}
                   extraAction={
                     <div className="flex items-center gap-1">
+                      {/* Drawing count */}
+                      {!!collection.drawingCount && (
+                        <span className="text-[9px] font-black tabular-nums px-1.5 py-0.5 rounded border shrink-0 bg-slate-100 dark:bg-neutral-800 text-slate-400 dark:text-neutral-500 border-slate-200 dark:border-neutral-700">
+                          {collection.drawingCount}
+                        </span>
+                      )}
                       {/* Shared indicator — only for owned collections that have been shared */}
                       {collection.isOwner !== false && collection.isShared && (
                         <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded border bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800">
                           Shared
                         </span>
                       )}
-                      {/* Role badge */}
-                      <span
-                        className={clsx(
-                          "text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded border shrink-0",
-                          collection.isOwner === false
-                            ? collection.sharedRole === "edit"
+                      {/* Role badge — only for collections shared with this user */}
+                      {collection.isOwner === false && (
+                        <span
+                          className={clsx(
+                            "text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded border shrink-0",
+                            collection.sharedRole === "edit"
                               ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800"
-                              : "bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800"
-                            : "bg-slate-100 dark:bg-neutral-800 text-slate-400 dark:text-neutral-500 border-slate-200 dark:border-neutral-700",
-                        )}
-                      >
-                        {collection.isOwner === false
-                          ? collection.sharedRole === "edit"
-                            ? "Editor"
-                            : "Viewer"
-                          : "Owner"}
-                      </span>
+                              : "bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800",
+                          )}
+                        >
+                          {collection.sharedRole === "edit" ? "Editor" : "Viewer"}
+                        </span>
+                      )}
                     </div>
                   }
                 />
