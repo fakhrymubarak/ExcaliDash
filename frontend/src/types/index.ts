@@ -22,6 +22,7 @@ export interface Collection {
   sharedRole?: "view" | "edit" | null;
   isOwner?: boolean;
   isShared?: boolean;
+  drawingCount?: number;
 }
 
 export type CollectionShareRole = "view" | "edit";

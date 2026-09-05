@@ -223,6 +223,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   onDrop={onDrop}
                   extraAction={
                     <div className="flex items-center gap-1">
+                      {/* Drawing count */}
+                      {!!collection.drawingCount && (
+                        <span className="shrink-0 rounded border px-1.5 py-0.5 text-[10px] font-semibold tabular-nums bg-slate-100 dark:bg-neutral-800 text-slate-400 dark:text-neutral-500 border-slate-200 dark:border-neutral-700">
+                          {collection.drawingCount}
+                        </span>
+                      )}
                       {/* Shared indicator — only for owned collections that have been shared */}
                       {collection.isOwner !== false && collection.isShared && (
                         <span className="rounded border border-emerald-200 bg-emerald-50 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-600 dark:border-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-400">
