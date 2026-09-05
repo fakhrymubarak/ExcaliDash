@@ -1,0 +1,40 @@
+name: Build images for VPS deploy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read version
+        id: version
+        run: echo "value=$(cat VERSION)" >> "$GITHUB_OUTPUT"
+
+      - name: Build backend image
+        run: |
+          docker build -f backend/Dockerfile \
+            --build-arg APP_BUILD_LABEL=${{ github.sha }} \
+            -t excalidash-backend:fix-265 .
+
+      - name: Build frontend image
+        run: |
+          docker build -f frontend/Dockerfile \
+            --build-arg VITE_APP_VERSION=${{ steps.version.outputs.value }} \
+            --build-arg VITE_APP_BUILD_LABEL=${{ github.sha }} \
+            -t excalidash-frontend:fix-265 .
+
+      - name: Save images
+        run: |
+          docker save excalidash-backend:fix-265 | gzip > excalidash-backend-fix-265.tar.gz
+          docker save excalidash-frontend:fix-265 | gzip > excalidash-frontend-fix-265.tar.gz
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: excalidash-images
+          path: |
+            excalidash-backend-fix-265.tar.gz
+            excalidash-frontend-fix-265.tar.gz
+          retention-days: 1
