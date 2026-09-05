@@ -6,6 +6,12 @@ WORKDIR /app
 # Native build deps for modules that may compile from source (e.g., better-sqlite3 on arm64)
 RUN apk add --no-cache python3 make g++
 
+# Longer npm fetch retry/timeout so native-module downloads (e.g. better-sqlite3's
+# node headers) survive slow networking under QEMU-emulated cross-platform builds.
+ENV npm_config_fetch_retries=5 \
+    npm_config_fetch_retry_mintimeout=20000 \
+    npm_config_fetch_timeout=120000
+
 # Copy package files
 COPY package*.json ./
 COPY tsconfig.json ./
@@ -38,6 +44,12 @@ RUN apk add --no-cache openssl su-exec && \
     adduser -S nodejs -u 1001
 
 WORKDIR /app
+
+# Longer npm fetch retry/timeout so native-module downloads (e.g. better-sqlite3's
+# node headers) survive slow networking under QEMU-emulated cross-platform builds.
+ENV npm_config_fetch_retries=5 \
+    npm_config_fetch_retry_mintimeout=20000 \
+    npm_config_fetch_timeout=120000
 
 # Copy package files
 COPY package*.json ./
