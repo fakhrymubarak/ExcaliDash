@@ -1,9 +1,10 @@
+// @vitest-environment jsdom
 import { afterEach, describe, expect, it } from "vitest";
 import {
   attachCanvasZoomForwarding,
   createTrackpadGestureDetector,
   isLikelyTrackpadWheelEvent,
-} from "./canvasZoomForwarding";
+} from "../src/pages/editor/canvasZoomForwarding";
 
 /**
  * `isLikelyTrackpadWheelEvent` and `createTrackpadGestureDetector` only read
